@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/create-profile",
   "/subscribe(.*)",
+  "/qrs/(.*)",
 ]);
 
 const isSignUpRoute = createRouteMatcher(["/sign-up(.*)"]);

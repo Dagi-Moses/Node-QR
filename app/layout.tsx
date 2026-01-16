@@ -9,6 +9,7 @@ import NavBar from "../components/navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 // import { ReactQueryClientProvider } from "@/components/react-query-client-provider";
 import { AppProviders } from "@/components/providers/providers";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
           <AppProviders>
             <NavBar />
             {children}
+            <Toaster position="bottom-right" />
           </AppProviders>
         </body>
 

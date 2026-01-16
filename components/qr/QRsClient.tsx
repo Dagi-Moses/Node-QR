@@ -3,86 +3,97 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Project } from "@/lib/types";
-import ProjectsGrid from "./ProjectsGrid";
-import CreateProjectModal from "./CreateProjectModal";
+import { Project, QRCode } from "@/lib/types";
+
 
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import toast from "react-hot-toast";
-import { useProjectsStore } from "@/src/store/projects.store";
-import { Spinner } from "../spinner";
+import QRsGrid from "./QrGrid";
+import CreateQRModal from "./CreateQrModal";
 
 
-export default function ProjectsClient() {
-    const { projects, setProjects } = useProjectsStore();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [query, setQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState<"all" | Project["status"]>("all");
-    const [openCreate, setOpenCreate] = useState(false);
-    const [selectedId, setSelectedId] = useState<string | null>(null);
-    const { getToken } = useAuth();
+export default function QRsClient() {
 
 
     const router = useRouter();
 
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects`;
+    const { projectId } = useParams<{ projectId: string }>();
+
+    const [qrs, setQrs] = useState<QRCode[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [openCreate, setOpenCreate] = useState(false);
+    const { getToken } = useAuth();
+
+
+    const [query, setQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState<"all" | Project["status"]>("all");
+
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+
 
     useEffect(() => {
-        async function fetchProjects() {
+
+        console.log("project id ", projectId);
+        if (!projectId) return;
+
+        const fetchQrs = async () => {
             try {
-                setLoading(true);
                 const token = await getToken();
-                const res = await fetch(url,
+                const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects/${projectId}/qrs`;
+                setLoading(true);
+
+                const res = await fetch(
+                    url,
                     {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${token}`,
-                        }
-                    });
-                if (!res.ok) throw new Error("Failed to fetch projects");
-                const data: Project[] = await res.json();
-                setProjects(data);
-            } catch (err: unknown) {
-                console.error(err);
-                if (err instanceof Error) {
-                    setError(err.message);
-                } else if (typeof err === "string") {
-                    setError(err);
-                } else {
-                    setError("An error occurred");
-                }
+                        },
+                    },
+                );
+
+                if (!res.ok) throw new Error("Failed to fetch QRs");
+
+                const data: QRCode[] = await res.json();
+                setQrs(data);
+            } catch {
+                setError("Unable to load project QRs");
             } finally {
                 setLoading(false);
             }
-        }
+        };
 
-        fetchProjects();
-    }, []);
+        fetchQrs();
+    }, [projectId]);
+
+
 
 
 
 
     const filtered = useMemo(() => {
-        return projects.filter((p) => {
+        return qrs.filter((p) => {
             if (statusFilter !== "all" && p.status !== statusFilter) return false;
             if (query.trim() === "") return true;
             const q = query.toLowerCase();
-            return p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
+            return p.name.toLowerCase().includes(q);
         });
-    }, [projects, query, statusFilter]);
+    }, [qrs, query, statusFilter]);
+
+    const handleCreate = (p: QRCode) => {
+        setQrs((prev) => [p, ...prev]);
+    };
 
 
 
     const handleOpen = (id: string) => {
         setSelectedId(id);
-        router.push(`/dashboard/projects/${id}`);
+        router.push(`/dashboard/projects/${projectId}/qrs/${id}`);
 
     };
-
 
 
     return (
@@ -92,8 +103,8 @@ export default function ProjectsClient() {
             {/* header row */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-foreground">Projects</h2>
-                    <p className="text-muted-foreground mt-1">Manage project groups that contain your QR codes.</p>
+                    <h2 className="text-2xl font-bold text-foreground">QR Codes</h2>
+                    <p className="text-muted-foreground mt-1">Manage your QR codes.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -102,7 +113,7 @@ export default function ProjectsClient() {
                         <input
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search projects"
+                            placeholder="Search QR"
                             className="pl-10 pr-3 py-2 rounded-lg border border-border bg-background text-foreground"
                         />
                     </div>
@@ -114,32 +125,32 @@ export default function ProjectsClient() {
                     >
                         <option value="all">All</option>
                         <option value="active">Active</option>
-                        <option value="draft">Draft</option>
-                        <option value="archived">Archived</option>
+                        <option value="disabled">Disabled</option>
+
                     </select>
 
                     <button
                         onClick={() => setOpenCreate(true)}
                         className="px-4 py-2 rounded bg-primary text-primary-foreground font-medium"
                     >
-                        New Project
+                        New QR
                     </button>
                 </div>
             </div>
 
             {/* grid */}
-            <ProjectsGrid projects={filtered} onOpen={handleOpen} />
+            <QRsGrid qrs={filtered} onOpen={handleOpen} />
 
             <div className="flex flex-col items-center justify-center my-6">
-
-
-                {loading &&
-                    <Spinner />
-                }
+                {loading && <p>Loading QR Code s...</p>}
                 {error && <p className="text-red-500">{error}</p>}
             </div>
             {/* create modal */}
-            <CreateProjectModal open={openCreate} onClose={() => setOpenCreate(false)} />
+            <CreateQRModal
+                open={openCreate}
+                onClose={() => setOpenCreate(false)}
+                projectId={projectId}            // onCreate={handleCreate}
+            />
         </div>
     );
 }

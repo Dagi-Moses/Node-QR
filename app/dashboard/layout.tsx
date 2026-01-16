@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         Analytics
                     </Link>
                     <Link
-                        href="/dashboard/settings"
+                        href="/dashboard/profile"
                         className={`px-4 py-2 rounded hover:bg-primary/10 hover:text-primary font-medium transition-all duration-300 ${page == 'settings' ? "bg-primary text-primary-foreground" : ""}`}
                     >
                         Profile

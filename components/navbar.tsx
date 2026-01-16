@@ -4,14 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 import { useUser, SignedIn, SignedOut, SignOutButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 
 export default function NavBar() {
     const { isLoaded, isSignedIn, } = useUser();
+    const pathname = usePathname();
+    const isHome = pathname === "/";
 
     return <nav>
         <div className="w-full py-6 border-b bg-background">
-            <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+            {/* <div className= {`max-w-6xl mx-auto px-6 flex items-center justify-between `}> */}
+            <div
+                className={`px-6 flex items-center justify-between ${isHome ? "mx-auto max-w-6xl" : "mx-5 max-w-8xl "
+                    }`}
+            >
                 <Link
                     href={isSignedIn ? "/dashboard/projects" : "/"}
                 >

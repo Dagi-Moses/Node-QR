@@ -8,13 +8,16 @@ import ProjectCard from "./ProjectCard";
 type Props = {
     projects: Project[];
     onOpen: (id: string) => void;
+
 };
 
-export default function ProjectsGrid({ projects, onOpen }: Props) {
+export default function ProjectsGrid({ projects, onOpen, }: Props) {
+
+
     if (!projects.length) {
         return (
             <div className="bg-muted p-8 rounded-xl text-center text-muted-foreground">
-                No projects yet. Create your first project to start generating QR codes.
+                📂  No projects yet. Create your first project to start generating QR codes.
             </div>
         );
     }
