@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/components/projects/ProjectCard.tsx
 "use client";
 
@@ -6,23 +7,25 @@ import { Clock, List } from "lucide-react";
 import { ProjectActionsMenu } from "./ProjectsActionMenu";
 import { useAuth } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-
+import { useRouter } from "next/navigation";
 import { useProjectsStore } from "@/src/store/projects.store";
+
 
 
 type Props = {
     project: Project;
-    onOpen: (id: string) => void;
+
 };
 
 
 
 
 
-export default function ProjectCard({ project, onOpen }: Props) {
+export default function ProjectCard({ project, }: Props) {
     const { id, name, description, qrCount, status, createdAt } = project;
     const { deleteProject } = useProjectsStore();
     const { getToken } = useAuth();
+    const router = useRouter();
 
     const handleDelete = async () => {
 
@@ -88,7 +91,7 @@ export default function ProjectCard({ project, onOpen }: Props) {
                     onClick={
 
 
-                        () => onOpen(id)
+                        () => router.push(`/dashboard/projects/${id}`)
                     }
                     className="px-3 py-2 rounded-md border border-border text-sm bg-muted text-muted-foreground hover:bg-muted/90"
                 >

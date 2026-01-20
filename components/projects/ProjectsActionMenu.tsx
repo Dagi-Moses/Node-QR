@@ -1,8 +1,8 @@
 import { MoreVertical } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { DeleteProjectModal } from "./DeleteProjectModal";
-
 import { useRouter } from "next/navigation";
+import { DeleteModal } from "../delete-modal";
+
 
 
 
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 type Props = {
     projectId: string;
     projectName: string;
-    onDelete: (id: string) => Promise<void>;
+    onDelete: () => Promise<void>;
 };
 
 export function ProjectActionsMenu({
@@ -81,17 +81,27 @@ export function ProjectActionsMenu({
 
             {
                 showDelete && (
-                    <DeleteProjectModal
-                        projectId={projectId}
+
+                    <DeleteModal
+                        title="Project"
+                        description="All QR codes and analytics under"
                         projectName={projectName}
+
+                        onConfirm={onDelete}
                         onClose={() => setShowDelete(false)}
-                        onConfirm={
-                            onDelete
-
-
-
-                        }
                     />
+
+                    // <DeleteProjectModal
+                    //     projectId={projectId}
+                    //     projectName={projectName}
+                    //     onClose={() => setShowDelete(false)}
+                    //     onConfirm={
+                    //         onDelete
+
+
+
+                    //     }
+                    // />
                 )
             }
         </>

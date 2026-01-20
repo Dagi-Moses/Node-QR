@@ -8,9 +8,8 @@ import ProjectsGrid from "./ProjectsGrid";
 import CreateProjectModal from "./CreateProjectModal";
 
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import toast from "react-hot-toast";
+
 import { useProjectsStore } from "@/src/store/projects.store";
 import { Spinner } from "../spinner";
 
@@ -25,8 +24,6 @@ export default function ProjectsClient() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { getToken } = useAuth();
 
-
-    const router = useRouter();
 
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects`;
 
@@ -77,11 +74,6 @@ export default function ProjectsClient() {
 
 
 
-    const handleOpen = (id: string) => {
-        setSelectedId(id);
-        router.push(`/dashboard/projects/${id}`);
-
-    };
 
 
 
@@ -128,7 +120,7 @@ export default function ProjectsClient() {
             </div>
 
             {/* grid */}
-            <ProjectsGrid projects={filtered} onOpen={handleOpen} />
+            <ProjectsGrid projects={filtered} />
 
             <div className="flex flex-col items-center justify-center my-6">
 

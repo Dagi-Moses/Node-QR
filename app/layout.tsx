@@ -22,6 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+
   title: "NodeQR - Smart QR Code and Link Manager",
   description: "Create, track, and manage dynamic QR codes with real - time analytics and secure link routing.Designed for seamless business workflows and fast deployment.",
 };

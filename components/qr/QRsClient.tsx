@@ -11,6 +11,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import QRsGrid from "./QrGrid";
 import CreateQRModal from "./CreateQrModal";
+import { useQrsStore } from "@/src/store/qrs.store";
 
 
 export default function QRsClient() {
@@ -20,7 +21,7 @@ export default function QRsClient() {
 
     const { projectId } = useParams<{ projectId: string }>();
 
-    const [qrs, setQrs] = useState<QRCode[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [openCreate, setOpenCreate] = useState(false);
@@ -31,11 +32,21 @@ export default function QRsClient() {
     const [statusFilter, setStatusFilter] = useState<"all" | Project["status"]>("all");
 
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const { qrs } = useQrsStore();
+    const projectQrs = qrs[projectId] || [];
+
+    const { setQrs, } = useQrsStore();
+    // const { setQrs, addQr, updateQr, deleteQr } = useQrsStore();
+    // const setQrsStore = useQrsStore((s) => s.setQrs);
+
+    // const addQrToProject = useQrsStore((s) => s.addQr);
+    // const updateQrInProject = useQrsStore((s) => s.updateQr);
+    // const deleteQrFromProject = useQrsStore((s) => s.deleteQr);
+
 
 
     useEffect(() => {
 
-        console.log("project id ", projectId);
         if (!projectId) return;
 
         const fetchQrs = async () => {
@@ -58,7 +69,7 @@ export default function QRsClient() {
                 if (!res.ok) throw new Error("Failed to fetch QRs");
 
                 const data: QRCode[] = await res.json();
-                setQrs(data);
+                setQrs(projectId, data);
             } catch {
                 setError("Unable to load project QRs");
             } finally {
@@ -75,25 +86,20 @@ export default function QRsClient() {
 
 
     const filtered = useMemo(() => {
-        return qrs.filter((p) => {
+        return projectQrs.filter((p) => {
             if (statusFilter !== "all" && p.status !== statusFilter) return false;
             if (query.trim() === "") return true;
             const q = query.toLowerCase();
             return p.name.toLowerCase().includes(q);
         });
-    }, [qrs, query, statusFilter]);
+    }, [projectQrs, query, statusFilter]);
 
-    const handleCreate = (p: QRCode) => {
-        setQrs((prev) => [p, ...prev]);
-    };
+    // const handleCreate = (p: QRCode) => {
+    //     setQrs((prev) => [p, ...prev]);
+    // };
 
 
 
-    const handleOpen = (id: string) => {
-        setSelectedId(id);
-        router.push(`/dashboard/projects/${projectId}/qrs/${id}`);
-
-    };
 
 
     return (
@@ -139,7 +145,7 @@ export default function QRsClient() {
             </div>
 
             {/* grid */}
-            <QRsGrid qrs={filtered} onOpen={handleOpen} />
+            <QRsGrid qrs={filtered} />
 
             <div className="flex flex-col items-center justify-center my-6">
                 {loading && <p>Loading QR Code s...</p>}

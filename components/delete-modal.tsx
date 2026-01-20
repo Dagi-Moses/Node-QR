@@ -1,40 +1,44 @@
-
-
 "use client"
-
 
 import { useState } from "react";
 
-type Props = {
-    projectId: string;
-    projectName: string;
+type DeleteModalProps = {
+    // Optional text overrides
+    title?: string; // e.g. "Delete project" or "Delete QR Code"
+    description?: string; // e.g. "All QR codes under ..." or custom text
+    projectName: string; // e.g. "Delete"
+
+   
     onClose: () => void;
-    onConfirm: (id: string) => Promise<void>;
+    onConfirm: () => Promise<void>;
 };
 
-export function DeleteProjectModal({
-    projectId,
-    projectName,
+export function DeleteModal({
+    title = "item",
+    description = "All QR codes and analytics under",
+    projectName ,
     onClose,
     onConfirm,
-}: Props) {
+}: DeleteModalProps) {
     const [value, setValue] = useState("");
+
+
     const isMatch = value === projectName;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
             <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-lg">
-                <h2 className="text-lg font-semibold text-red-600">
-                    Delete project
-                </h2>
+                <h2 className="text-lg font-semibold text-red-600">Delete {title}</h2>
+
 
                 <p className="mt-2 text-sm text-muted-foreground">
-                    This action is irreversible. All QR codes and analytics under{" "}
-                    <span className="font-medium text-foreground">
-                        {projectName}
-                    </span>{" "}
-                    will be permanently deleted.
-                </p>
+                                    This action is irreversible. {description}{" "}
+                               <span className="font-medium text-foreground">
+                                       {projectName}
+                                    </span>{" "}
+                                    will be permanently deleted.
+                                </p>
+
 
                 <p className="mt-4 text-sm">
                     Type <span className="font-semibold">{projectName}</span> to confirm.
@@ -44,7 +48,7 @@ export function DeleteProjectModal({
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Project name"
+                    placeholder={projectName}
                 />
 
                 <div className="mt-6 flex justify-end gap-2">
@@ -58,7 +62,7 @@ export function DeleteProjectModal({
                     <button
                         disabled={!isMatch}
                         onClick={async () => {
-                            await onConfirm(projectId);
+                            await onConfirm();
                             onClose();
                         }}
                         className="px-3 py-2 rounded-md text-sm bg-red-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -74,17 +78,13 @@ export function DeleteProjectModal({
 
 
 
+// "use client"
 
-
-
-
-
-
-// "use client";
 
 // import { useState } from "react";
 
 // type Props = {
+    
 //     projectId: string;
 //     projectName: string;
 //     onClose: () => void;
@@ -97,44 +97,50 @@ export function DeleteProjectModal({
 //     onClose,
 //     onConfirm,
 // }: Props) {
-//     const [input, setInput] = useState("");
-//     const [loading, setLoading] = useState(false);
-
-//     const canDelete = input === projectName;
+//     const [value, setValue] = useState("");
+//     const isMatch = value === projectName;
 
 //     return (
-//         <div className="fixed inset-0 z-[100] bg-black/40 flex items-center justify-center">
-//             <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
-//                 <h2 className="text-lg font-semibold mb-2 text-red-600">
-//                     Delete Project
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
+//             <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-lg">
+//                 <h2 className="text-lg font-semibold text-red-600">
+//                     Delete project
 //                 </h2>
 
-//                 <p className="text-sm text-gray-600 mb-4">
-//                     Type <strong>{projectName}</strong> to confirm deletion.
+//                 <p className="mt-2 text-sm text-muted-foreground">
+//                     This action is irreversible. All QR codes and analytics under{" "}
+//                     <span className="font-medium text-foreground">
+//                         {projectName}
+//                     </span>{" "}
+//                     will be permanently deleted.
+//                 </p>
+
+//                 <p className="mt-4 text-sm">
+//                     Type <span className="font-semibold">{projectName}</span> to confirm.
 //                 </p>
 
 //                 <input
-//                     value={input}
-//                     onChange={(e) => setInput(e.target.value)}
-//                     className="w-full border rounded-md px-3 py-2 mb-4"
+//                     value={value}
+//                     onChange={(e) => setValue(e.target.value)}
+//                     className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+//                     placeholder="Project name"
 //                 />
 
-//                 <div className="flex justify-end gap-2">
+//                 <div className="mt-6 flex justify-end gap-2">
 //                     <button
 //                         onClick={onClose}
-//                         className="px-4 py-2 rounded-md bg-gray-100"
+//                         className="px-3 py-2 rounded-md border border-border text-sm"
 //                     >
 //                         Cancel
 //                     </button>
 
 //                     <button
-//                         disabled={!canDelete || loading}
+//                         disabled={!isMatch}
 //                         onClick={async () => {
-//                             setLoading(true);
 //                             await onConfirm(projectId);
 //                             onClose();
 //                         }}
-//                         className="px-4 py-2 rounded-md bg-red-600 text-white disabled:opacity-50"
+//                         className="px-3 py-2 rounded-md text-sm bg-red-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
 //                     >
 //                         Delete
 //                     </button>
@@ -143,6 +149,11 @@ export function DeleteProjectModal({
 //         </div>
 //     );
 // }
+
+
+
+
+
 
 
 

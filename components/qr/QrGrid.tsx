@@ -7,7 +7,7 @@ import { QRCode } from "@/lib/types";
 
 type Props = {
   qrs: QRCode[];
-  onOpen: (id: string) => void;
+
 };
 
 
@@ -16,7 +16,7 @@ FOR INSTANCE IF NOT FOUND SAY SOMETHING LIKE "PROJECT NOT FOUND...": IF EMPTY SA
 */
 
 
-export default function QRsGrid({ qrs, onOpen }: Props) {
+export default function QRsGrid({ qrs }: Props) {
   if (!qrs.length) {
     return (
       <div className="bg-muted p-8 rounded-xl text-center text-muted-foreground">
@@ -28,7 +28,7 @@ export default function QRsGrid({ qrs, onOpen }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {qrs.map((p) => (
-        <QrCard key={p.id} qr={p} onOpen={onOpen} />
+        <QrCard key={p.id} qr={p} />
       ))}
     </div>
   );
