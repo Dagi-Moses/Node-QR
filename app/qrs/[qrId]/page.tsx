@@ -36,6 +36,8 @@ export default function QrDetailPage() {
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/qrs/${qrId}`
                 );
 
+                console.log("res", res);
+                alert(res);
                 if (!res.ok) {
                     throw new Error("QR not found");
                 }

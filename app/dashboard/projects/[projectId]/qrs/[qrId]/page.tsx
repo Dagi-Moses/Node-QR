@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,13 +8,20 @@ import { FiDownload, FiCopy, FiCheck } from "react-icons/fi";
 import { Spinner } from "@/components/spinner";
 import { useAuth } from "@clerk/nextjs";
 import { QRStatus } from "@/lib/types";
+import toast from "react-hot-toast";
+import { useQrsStore } from "@/src/store/qrs.store";
+import { DeleteModal } from "@/components/delete-modal";
 
 export default function QrDetailPage() {
     const { projectId, qrId } = useParams<{ projectId: string; qrId: string }>();
     const router = useRouter();
     const { getToken } = useAuth();
-
+    const deleteQrFromProject = useQrsStore((s) => s.deleteQr);
     const [loading, setLoading] = useState(true);
+
+    const [saveLoading, setSaveLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
 
@@ -21,7 +29,10 @@ export default function QrDetailPage() {
     const [url, setUrl] = useState("");
     const [status, setStatus] = useState<QRStatus>("active");
 
+    const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects/${projectId}/qrs/${qrId}`;
+
     const publicPageUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/qrs/${qrId}`;
+    const encodedUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/q/${qrId}`;
 
     useEffect(() => {
         if (!projectId || !qrId) return;
@@ -30,7 +41,7 @@ export default function QrDetailPage() {
             try {
                 const token = await getToken();
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects/${projectId}/qrs/${qrId}`,
+                    apiUrl,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
@@ -65,11 +76,41 @@ export default function QrDetailPage() {
         link.download = `${name || "qr"}.png`;
         link.click();
     };
+    const handleDelete = async () => {
 
+
+        try {
+            setDeleteLoading(true);
+            const token = await getToken();
+            const res = await fetch(
+                apiUrl,
+                { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (!res.ok) throw new Error("Failed to delete QR");
+
+
+            deleteQrFromProject(projectId, qrId);
+            if (window.history.length > 1) {
+                router.back();
+            } else {
+                router.push("/dashboard/projects");
+            }
+            toast.success("QR deleted!",);
+
+
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err?.message ?? "Failed to delete QR");
+
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
+            setSaveLoading(true);
+            const token = await getToken();
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects/${projectId}/qrs/${qrId}`,
                 {
@@ -83,10 +124,12 @@ export default function QrDetailPage() {
             );
 
             if (!res.ok) throw new Error("Failed to update QR");
-            alert("QR updated successfully!");
+            toast.success("QR updated successfully!");
         } catch (err: any) {
             console.error(err);
-            alert(err.message || "Failed to save changes");
+            toast.error(err.message || "Failed to save changes");
+        } finally {
+            setSaveLoading(false);
         }
     };
 
@@ -103,144 +146,170 @@ export default function QrDetailPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-3">
-            <div className="mx-auto max-w-6xl flex flex-col lg:flex-row justify-between gap-8">
+        <>
+            <div className="min-h-screen bg-gray-50 p-3">
+                <div className="mx-auto max-w-6xl flex flex-col lg:flex-row justify-between gap-8">
 
-                {/* LEFT – FORM */}
-                <div className="flex-2 space-y-6">
-                    <h2 className="text-xl font-semibold">
-                        Edit content on your QR code
-                    </h2>
+                    {/* LEFT – FORM */}
+                    <div className="flex-2 space-y-6">
+                        <h2 className="text-xl font-semibold">
+                            Edit content on your QR code
+                        </h2>
 
-                    {/* Website Info */}
-                    <section className="bg-white rounded-xl border p-5 space-y-3">
-                        <h3 className="font-medium">Website Information *</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Input the URL this QR will redirect to.
-                        </p>
+                        {/* Website Info */}
+                        <section className="bg-white rounded-xl border p-5 space-y-3">
+                            <h3 className="font-medium">Website Information *</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Input the URL this QR will redirect to.
+                            </p>
 
-                        <input
-                            type="url"
-                            value={url}
-                            onChange={(e) => setUrl(e.target.value)}
-                            placeholder="https://example.com"
-                            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                        />
-                    </section>
+                            <input
+                                type="url"
+                                value={url}
+                                onChange={(e) => setUrl(e.target.value)}
+                                placeholder="https://example.com"
+                                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+                            />
+                        </section>
 
-                    {/* Name */}
-                    <section className="bg-white rounded-xl border p-5 space-y-3">
-                        <h3 className="font-medium">Name of the QR Code *</h3>
+                        {/* Name */}
+                        <section className="bg-white rounded-xl border p-5 space-y-3">
+                            <h3 className="font-medium">Name of the QR Code *</h3>
 
-                        <input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="My QR Code"
-                            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                        />
-                    </section>
-                    <section className="bg-white rounded-xl border p-5 space-y-3">
-                        <h3 className="font-medium">QR Code Status</h3>
-                        <select
-                            value={status}
-                            onChange={(e) =>
-                                setStatus(e.target.value as QRStatus)
-                            }
-                            className="px-3 py-2 border rounded-md max-w-[100px] "
-                        >
-                            <option value="active">Active</option>
-                            <option value="disabled">Disabled</option>
+                            <input
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="My QR Code"
+                                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+                            />
+                        </section>
+                        <section className="bg-white rounded-xl border p-5 space-y-3">
+                            <h3 className="font-medium">QR Code Status</h3>
+                            <select
+                                value={status}
+                                onChange={(e) =>
+                                    setStatus(e.target.value as QRStatus)
+                                }
+                                className="px-3 py-2 border rounded-md max-w-[200px] "
+                            >
+                                <option value="active">Active</option>
+                                <option value="disabled">Disabled</option>
 
-                        </select>
+                            </select>
 
-                    </section>
+                        </section>
 
-                    <div className="flex w-full gap-2 mt-2">
-                        <button
-                            onClick={() => console.log("saved")}
-                            className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                        >
-                            Save
-                        </button>
-                        <button
-                            onClick={() => console.log("deleted")}
-                            className="flex-1 bg-red-500 text-white p-2 rounded hover:bg-red-600"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                </div>
+                        <div className="flex w-full gap-10 mt-2">
+                            <button
+                                disabled={deleteLoading || saveLoading}
+                                onClick={handleSave}
+                                className="flex-1 bg-primary text-primary-foreground p-2 rounded-lg hover:bg-primary/80"
+                            >
+                                {saveLoading ? " Saving..." : "Save"}
+                            </button>
+                            <button
+                                disabled={deleteLoading || saveLoading}
+                                onClick={() => {
 
-
-                {/* URL – PHONE PREVIEW */}
-
-                <div className=" w-[300px] h-[600px] rounded-[40px] border bg-white shadow-lg overflow-hidden" title="URL Preview">
-                    <div className="h-14 bg-orange-400 flex items-center px-4">
-                        <div className="bg-white/80 rounded-full px-3 py-1 text-xs truncate w-full">
-                            {url || "https://example.com"}
+                                    setShowDelete(true);
+                                }}
+                                className="flex-1 flex items-center justify-center text-primary gap-2 bg-gray-100 rounded-lg py-2 hover:bg-gray-200 border"
+                            >
+                                {deleteLoading ? " Deleting..." : "Delete"}
+                            </button>
                         </div>
                     </div>
 
-                    {url ? (
-                        <iframe
-                            src="https://dagi-moses.web.app/"
-                            className="w-full h-full border-none"
-                            sandbox="allow-scripts allow-same-origin allow-forms"
-                            aria-label="Preview"
-                        />
-                    ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                            Enter a URL to preview
+
+
+
+                    {/* RIGHT QR – PHONE PREVIEW */}
+
+                    <div className="flex justify-center" title="QR Link">
+
+                        <div className="w-[300px] h-[600px] rounded-[40px] border bg-white shadow-lg overflow-hidden flex flex-col">
+                            {/* Fake browser bar */}
+                            <div className="h-14 bg-orange-400 flex items-center px-4 shrink-0">
+                                <div className="bg-white/80 rounded-full px-3 py-1 text-xs truncate w-full">
+                                    {publicPageUrl || "https://example.com"}
+                                </div>
+                            </div>
+
+                            {/* Body */}
+                            <div className="flex flex-1 flex-col justify-between p-6">
+                                {/* Center QR */}
+                                <div className="flex flex-1 items-center justify-center">
+                                    <QRCodeCanvas value={encodedUrl} size={180} />
+                                </div>
+
+                                {/* Bottom actions */}
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleDownload}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition"
+                                    >
+                                        <FiDownload className="w-4" />
+                                        Download
+                                    </button>
+
+
+
+                                    <button
+                                        onClick={handleCopy}
+                                        className="flex-1 flex items-center justify-center gap-2 bg-gray-100 rounded-lg py-2 hover:bg-gray-200"
+                                    >
+                                        {copied ? <FiCheck className="text-green-500" /> : <FiCopy />}
+                                        {copied ? "Copied" : "Copy Link"}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </div>
+                    </div>
 
 
-                {/* RIGHT QR – PHONE PREVIEW */}
 
-                <div className="flex justify-center" title="QR Link">
 
-                    <div className="w-[300px] h-[600px] rounded-[40px] border bg-white shadow-lg overflow-hidden flex flex-col">
-                        {/* Fake browser bar */}
-                        <div className="h-14 bg-orange-400 flex items-center px-4 shrink-0">
+
+                    {/* URL – PHONE PREVIEW */}
+
+                    <div className=" w-[300px] h-[600px] rounded-[40px] border bg-white shadow-lg overflow-hidden" title="URL Preview">
+                        <div className="h-14 bg-orange-400 flex items-center px-4">
                             <div className="bg-white/80 rounded-full px-3 py-1 text-xs truncate w-full">
-                                {publicPageUrl || "https://example.com"}
+                                {url || "https://example.com"}
                             </div>
                         </div>
 
-                        {/* Body */}
-                        <div className="flex flex-1 flex-col justify-between p-6">
-                            {/* Center QR */}
-                            <div className="flex flex-1 items-center justify-center">
-                                <QRCodeCanvas value={publicPageUrl} size={180} />
+                        {url ? (
+                            <iframe
+                                src={url || "https://example.com"}
+                                className="w-full h-full border-none"
+                                sandbox="allow-scripts allow-same-origin allow-forms"
+                                aria-label="Preview"
+                            />
+                        ) : (
+                            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                                Enter a URL to preview
                             </div>
-
-                            {/* Bottom actions */}
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={handleDownload}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                                >
-                                    <FiDownload className="w-4" />
-                                    Download
-                                </button>
-
-
-
-                                <button
-                                    onClick={handleCopy}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-gray-100 rounded-lg py-2 hover:bg-gray-200"
-                                >
-                                    {copied ? <FiCheck className="text-green-500" /> : <FiCopy />}
-                                    {copied ? "Copied" : "Copy Link"}
-                                </button>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
-
             </div>
-        </div>
+            {
+                showDelete && (
+
+                    <DeleteModal
+                        title="QR Code"
+                        description={"All Scan and analytics under"}
+                        projectName={name}
+
+                        onConfirm={handleDelete}
+                        onClose={() => setShowDelete(false)}
+                    />
+
+
+                )
+            }
+        </>
     );
 }
 
