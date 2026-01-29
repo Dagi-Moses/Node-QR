@@ -2,84 +2,21 @@
 "use client";
 
 import InsightDeviceCard from "@/components/analytics/insight-devices-card";
-import { InsightItem } from "@/components/analytics/insight-row";
+
 import LineChartCard from "@/components/analytics/line-chart-card";
 import LocationsCard from "@/components/analytics/locations-card";
 import OsDonut from "@/components/analytics/os-donut";
 import StatCard from "@/components/analytics/stats-card";
 import TopQrList from "@/components/analytics/top-qr-list";
-import { AnalyticsResponse, DateRange, StatItem, TopProject, TopQr } from "@/lib/models";
+import { AnalyticsResponse, DateRange, InsightItem, Locations, OsData, ScansData, StatItem, TopProject, TopQr } from "@/lib/models";
 import { deviceIconMap, browserIconMap } from "@/lib/icons-map";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 
 
 
-// const stats = [
-//   { label: "Total Scans", value: 425, change: "+23%" },
-//   { label: "Unique Unique", value: 53, change: "+12%" },
-//   { label: "Active dynamic codes", value: 65, change: "+13%" },
-//   { label: "Avg per code", value: 1.53, change: "+23%" },
-// ];
 
-const scansData = [
-  { month: "Jan", total: 5, unique: 1 },
-  { month: "Feb", total: 12, unique: 3 },
-  { month: "Mar", total: 16, unique: 4 },
-  { month: "Apr", total: 14, unique: 8 },
-  { month: "May", total: 18, unique: 10 },
-  { month: "Jun", total: 30, unique: 6 },
-  { month: "Jul", total: 26, unique: 4 },
-  { month: "Aug", total: 22, unique: 6 },
-  { month: "Sep", total: 23, unique: 8 },
-  { month: "Oct", total: 24, unique: 12 },
-  { month: "Nov", total: 26, unique: 18 },
-  { month: "Dec", total: 28, unique: 25 },
-];
-// const topQrs = [
-//   { id: "1", name: "Discount 15%", scans: 633, url: "https://example.com/discount15" },
-//   { id: "2", name: "Restaurant 5 avenue", scans: 234, url: "https://example.com/restaurant" },
-//   { id: "3", name: "Coffee Hall", scans: 221, url: "https://example.com/coffee" },
-//   { id: "4", name: "Concert Square", scans: 124, url: "https://example.com/concert" },
 
-// ];
-// const topProjectss = [
-//   { id: "1", name: "Project 1", scans: 633, qrCount: 40 },
-//   { id: "2", name: "Project 2", scans: 234, qrCount: 20 },
-//   { id: "3", name: "Project 3", scans: 221, qrCount: 10 },
-//   { id: "4", name: "Project 4", scans: 124, qrCount: 4 },
-
-// ];
-
-const locations = [
-  { city: "London", percent: 80 },
-  { city: "Liverpool", percent: 43 },
-  { city: "Manchester", percent: 14 },
-  { city: "Oxford", percent: 10 },
-  { city: "Newcastle", percent: 7 },
-];
-
-const osData = [
-  { name: "iOS", value: 73 },
-  { name: "Windows", value: 22 },
-  { name: "Android", value: 12 },
-  { name: "macOS", value: 9 },
-  { name: "Linux", value: 3 },
-];
-
-export const topDevices: InsightItem[] = [
-  { key: "mobile", label: "Mobile", percentage: 68 },
-  { key: "desktop", label: "Desktop", percentage: 24 },
-  { key: "tablet", label: "Tablet", percentage: 8 },
-  { key: "unknown", label: "Other", percentage: 8 },
-];
-
-export const topBrowsers: InsightItem[] = [
-  { key: "chrome", label: "Chrome", percentage: 61 },
-  { key: "safari", label: "Safari", percentage: 22 },
-  { key: "firefox", label: "Firefox", percentage: 9 },
-  { key: "unknown", label: "Other", percentage: 8 }, // fallback icon
-];
 
 
 
@@ -89,6 +26,11 @@ export const topBrowsers: InsightItem[] = [
 export default function AnalyticsPage() {
   const { getToken } = useAuth();
   const [stats, setStats] = useState<StatItem[]>([]);
+  const [scansData, setScansData] = useState<ScansData[]>([]);
+  const [osData, setOsData] = useState<OsData[]>([]);
+  const [locations, setLocations] = useState<Locations[]>([]);
+  const [topDevices, setTopDevices] = useState<InsightItem[]>([]);
+  const [topBrowsers, setTopBrowsers] = useState<InsightItem[]>([]);
   const [totalCodes, setTotalCodes] = useState<number>(0);
 
   const [topQrs, setTopQrs] = useState<TopQr[]>([]);
@@ -130,6 +72,11 @@ export default function AnalyticsPage() {
         setTopQrs(data.topQrs);
         setTopProjects(data.topProjects);
         setTotalCodes(data.totalCodes);
+        setScansData(data.scansData);
+        setLocations(data.locations);
+        setOsData(data.osData);
+        setTopDevices(data.topDevices);
+        setTopBrowsers(data.topBrowsers);
       } catch (err) {
         console.error("Failed to fetch analytics", err);
       } finally {

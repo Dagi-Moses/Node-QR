@@ -1,10 +1,6 @@
 import { DefaultIcon } from "@/lib/icons-map";
+import { InsightItem } from "@/lib/models";
 
-export interface InsightItem {
-    key: string;      // "mobile", "chrome", etc
-    label: string;    // "Mobile", "Chrome"
-    percentage: number;
-}
 
 
 

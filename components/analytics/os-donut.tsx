@@ -1,5 +1,15 @@
 
 import { ResponsiveContainer, Pie, Cell, PieChart } from "recharts";
+import { FaApple, FaWindows, FaAndroid, FaLinux, FaQuestion } from "react-icons/fa";
+import { JSX } from "react";
+
+const osIcons: Record<string, JSX.Element> = {
+    iOS: <FaApple size={100} className="text-gray-700" />,
+    macOS: <FaApple size={100} className="text-gray-700" />,
+    Windows: <FaWindows size={100} className="text-gray-700" />,
+    Android: <FaAndroid size={100} className="text-gray-700" />,
+    Linux: <FaLinux size={100} className="text-gray-700" />,
+};
 
 const COLORS = ["#2563eb", "#475569", "#60a5fa", "#93c5fd", "#cbd5e1"];
 
@@ -16,12 +26,13 @@ export default function OsDonut({ data }: { data: { name: string; value: number 
     const topOs = enriched.reduce((a, b) =>
         b.value > a.value ? b : a
     );
+    const topOsIcon = osIcons[topOs.name] ?? <FaQuestion size={100} className="text-gray-500" />;
 
     return (
         <div className="bg-white rounded-xl p-5 shadow-sm">
             <h3 className="font-medium mb-4">Operating System</h3>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center space-x-5 gap-6">
                 {/* Donut */}
                 <div className="relative w-[220px] h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -73,6 +84,8 @@ export default function OsDonut({ data }: { data: { name: string; value: number 
                         </div>
                     ))}
                 </div>
+
+                <div className="ml-2">{topOsIcon}</div>
             </div>
         </div>
     );

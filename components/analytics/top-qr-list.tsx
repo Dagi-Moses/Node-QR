@@ -66,12 +66,25 @@ export default function TopQrList({ topQrs,
                             <p className="text-sm font-medium truncate">
                                 {item.name}
                             </p>
-
                             <p className="text-xs text-muted-foreground">
-                                {tab === "qr"
-                                    ? (item as TopQr).url
-                                    : `${(item as TopProject).qrCount} codes`}
+                                {tab === "qr" ? (
+                                    (item as TopQr).url ? (
+                                        <a
+                                            href={(item as TopQr).url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            {(item as TopQr).url}
+                                        </a>
+                                    ) : (
+                                        "No URL"
+                                    )
+                                ) : (
+                                    `${(item as TopProject).qrCount} codes`
+                                )}
                             </p>
+
                         </div>
 
                         {/* Stat */}

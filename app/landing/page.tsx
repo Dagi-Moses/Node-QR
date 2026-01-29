@@ -18,25 +18,24 @@ export default function Landing() {
 
             <section className="py-24 bg-background">
                 <div className="max-w-6xl mx-auto px-6 text-center">
-                    <h2 className="text-4xl font-bold tracking-tight text-foreground">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
                         Create, Track & Manage Your QR Codes
                     </h2>
-
-                    <p className="mt-4 max-w-2xl mx-auto text-muted-foreground text-lg">
+                    <p className="mt-4 max-w-2xl mx-auto text-muted-foreground text-sm sm:text-base md:text-lg">
                         Generate dynamic QR codes, monitor real-time analytics, and manage all your links from a single dashboard.
                     </p>
 
-                    <div className="mt-8 flex justify-center gap-4">
+                    <div className="mt-8 flex sm:flex-row justify-center gap-4">
                         <Link
                             href={isSignedIn ? "/dashboard" : "/sign-up"}
-                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm"
+                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg text-xs sm:text-sm"
                         >
                             Get Started
                         </Link>
 
                         <a
                             href="#features"
-                            className="px-6 py-3 border border-border text-muted-foreground rounded-lg text-sm"
+                            className="px-6 py-3 border border-border text-muted-foreground rounded-lg text-xs sm:text-sm"
                         >
                             Learn More
                         </a>
@@ -64,26 +63,26 @@ export default function Landing() {
             {/* Features */}
             <section id="features" className="py-24 bg-background">
                 <div className="max-w-6xl mx-auto px-6">
-                    <h3 className="text-3xl font-semibold text-center text-foreground">Features</h3>
+                    <h3 className="text-2xl sm:text-3xl font-semibold text-center text-foreground">Features</h3>
 
-                    <div className="grid md:grid-cols-3 gap-10 mt-12">
+                    <div className="grid md:grid-cols-3 gap-10 mt-10">
                         <div className="p-6 bg-card rounded-xl shadow-sm">
-                            <h4 className="text-xl text-foreground font-semibold text-center">Dynamic QR Codes</h4>
-                            <p className="mt-3 text-muted-foreground text-sm text-center">
+                            <h4 className="text-base sm:text-xl  text-foreground font-semibold text-center">Dynamic QR Codes</h4>
+                            <p className="mt-3 text-muted-foreground text-xs sm:text-sm text-center">
                                 Update destination links anytime without changing the QR code.
                             </p>
                         </div>
 
                         <div className="p-6 bg-card rounded-xl shadow-sm">
-                            <h4 className="text-xl text-foreground font-semibold text-center">Analytics Dashboard</h4>
-                            <p className="mt-3 text-muted-foreground text-sm text-center">
+                            <h4 className="text-base sm:text-xl text-foreground font-semibold text-center">Analytics Dashboard</h4>
+                            <p className="mt-3 text-muted-foreground text-xs sm:text-sm text-center">
                                 Track scans, locations, devices, and daily usage trends.
                             </p>
                         </div>
 
                         <div className="p-6 bg-card rounded-xl shadow-sm">
-                            <h4 className="text-xl text-foreground font-semibold text-center">Custom Branding</h4>
-                            <p className="mt-3 text-muted-foreground text-sm">
+                            <h4 className="text-base sm:text-xl text-foreground font-semibold text-center">Custom Branding</h4>
+                            <p className="mt-3 text-muted-foreground text-xs sm:text-sm text-center">
                                 Add logos, frames, colors, and export high-quality QR codes.
                             </p>
                         </div>
@@ -94,14 +93,15 @@ export default function Landing() {
             {/* CTA */}
             <section className="py-24 bg-primary text-primary-foreground">
                 <div className="max-w-6xl mx-auto px-6 text-center">
-                    <h3 className="text-3xl font-bold">Ready to get started?</h3>
-                    <p className="mt-3 text-muted-foreground">
+                    <h3 className="text-2xl sm:text-3xl font-bold">Ready to get started?</h3>
+                    <p className="mt-3 text-muted-foreground text-sm sm:text-lg">
                         Generate your first QR code in seconds.
                     </p>
 
                     <a
                         href="/dashboard"
-                        className="inline-block mt-6 px-8 py-4 bg-card text-foreground rounded-lg font-medium"
+                        className="inline-block mt-6 px-8 py-4 bg-card text-foreground rounded-lg font-medium text-sm sm:text-base"
+                    // className="px-6 py-3 border border-border text-muted-foreground rounded-lg text-xs sm:text-sm"
                     >
                         Launch App
                     </a>
@@ -110,7 +110,7 @@ export default function Landing() {
 
             {/* Footer */}
             <footer className="py-10 text-center bg-background text-muted-foreground text-sm">
-                © {new Date().getFullYear()} QR Manager. All rights reserved.
+                © {new Date().getFullYear()} NodeQR. All rights reserved.
             </footer>
         </main>
     );

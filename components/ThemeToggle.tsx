@@ -5,34 +5,44 @@
 import { useEffect, useState, FC } from "react";
 import { Sun, Moon } from "lucide-react";
 import { cn } from "../lib/utils";
+import { useThemeStore } from "@/src/store/theme.store";
 
 export const ThemeToggle: FC = () => {
-    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+    const { isDarkMode, toggleTheme, setDarkMode } = useThemeStore();
 
     useEffect(() => {
-        const storedTheme: string | null = localStorage.getItem("theme");
+        const storedTheme = localStorage.getItem("theme");
+        setDarkMode(storedTheme === "dark");
+    }, [setDarkMode]);
 
-        if (storedTheme === "dark") {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setIsDarkMode(true);
-            document.documentElement.classList.add("dark");
-        } else {
-            setIsDarkMode(false);
-            document.documentElement.classList.remove("dark");
-        }
-    }, []);
 
-    const toggleTheme = (): void => {
-        if (isDarkMode) {
-            setIsDarkMode(false);
-            localStorage.setItem("theme", "light");
-            document.documentElement.classList.remove("dark");
-        } else {
-            setIsDarkMode(true);
-            localStorage.setItem("theme", "dark");
-            document.documentElement.classList.add("dark");
-        }
-    };
+    // const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+    // useEffect(() => {
+    //     const storedTheme: string | null = localStorage.getItem("theme");
+
+    //     if (storedTheme === "dark") {
+    //         // eslint-disable-next-line react-hooks/set-state-in-effect
+    //         setIsDarkMode(true);
+    //         document.documentElement.classList.add("dark");
+    //     } else {
+    //         setIsDarkMode(false);
+    //         document.documentElement.classList.remove("dark");
+    //     }
+    // }, []);
+
+    // const toggleTheme = (): void => {
+    //     if (isDarkMode) {
+    //         setIsDarkMode(false);
+    //         localStorage.setItem("theme", "light");
+    //         document.documentElement.classList.remove("dark");
+    //     } else {
+    //         setIsDarkMode(true);
+    //         localStorage.setItem("theme", "dark");
+    //         document.documentElement.classList.add("dark");
+    //     }
+    // };
 
     return (
         <button

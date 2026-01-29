@@ -1,4 +1,5 @@
 // models/analytics.ts
+
 export interface Stats {
   totalScans: number;
   uniqueVisitors: number;
@@ -26,10 +27,36 @@ export interface TopProject {
   qrCount: number;
 }
 
+export interface ScansData {
+  month: string;
+  total: number;
+  unique: number;
+}
+export interface Locations {
+  city: string;
+  percent: number;
+}
+export interface OsData {
+  name: string;
+  value: number;
+}
+
+export interface InsightItem {
+  key: string;
+  label: string;
+  percentage: number;
+}
+
 export interface AnalyticsResponse {
   stats: StatItem[];
   topQrs: TopQr[];
   topProjects: TopProject[];
+  totalCodes: number;
+  scansData: ScansData[];
+  locations: Locations[];
+  osData: OsData[];
+  topDevices: InsightItem[];
+  topBrowsers: InsightItem[];
 }
 
 // models/analytics.ts
